@@ -21,12 +21,11 @@
 import React from 'react'
 import { HelloWorld } from './HelloWorld'
 import { ExtensionProvider40 } from '@looker/extension-sdk-react'
-import { hot } from 'react-hot-loader/root'
 
-export const App = hot(() => {
+export const App = () => {
   return (
     <ExtensionProvider40>
       <HelloWorld />
     </ExtensionProvider40>
   )
-})
+}
