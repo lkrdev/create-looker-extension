@@ -23,12 +23,12 @@
 
 import {
   connectExtensionHost,
-  LookerExtensionSDK40,
+  LookerExtensionSDK,
 } from "@looker/extension-sdk";
 
 (async () => {
   const extensionSdk = await connectExtensionHost();
-  const sdk40 = LookerExtensionSDK40.createClient(extensionSdk);
+  const sdk40 = LookerExtensionSDK.createClient(extensionSdk);
   const result = await sdk40.me();
   const name = result.ok ? result.value.display_name : "Unknown";
   document.write(`
