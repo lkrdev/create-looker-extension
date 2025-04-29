@@ -25,7 +25,7 @@ module.exports = {
     rules: [...commonConfig.module.rules],
   },
   devServer: {
-    index: "index.html",
+    server: "https",
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",

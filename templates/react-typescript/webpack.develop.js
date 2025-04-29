@@ -23,16 +23,11 @@ module.exports = {
   mode: 'development',
   module: {
     rules: [
-      ...commonConfig.module.rules,
-      {
-        test: /\.(js|jsx|ts|tsx)?$/,
-        use: 'react-hot-loader/webpack',
-        include: /node_modules/,
-      },
+      ...commonConfig.module.rules
     ],
   },
   devServer: {
-    index: 'index.html',
+    server: 'https',
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
