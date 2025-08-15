@@ -39,6 +39,10 @@ module.exports = {
         include: /src/,
         sideEffects: false,
       },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
   resolve: {

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env npx
 
 // Copyright 2021 Google LLC
 

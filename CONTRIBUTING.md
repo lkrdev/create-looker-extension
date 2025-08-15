@@ -38,7 +38,7 @@ To develop locally, simply run
 ./index.js your-project-name
 ```
 
-from within the root directory, rather than the `yarn create` command. Everything else should be identical.
+from within the root directory, rather than the `npm init` command. Everything else should be identical.
 
 ### Bug Reports
 

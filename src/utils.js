@@ -29,12 +29,17 @@ const cleanup = (dirname) => {
 };
 
 const generatorPrompt = (projectName) => {
+  const promptState = {};
   return prompt([
     {
       type: "input",
       name: "projectName",
       message: "What would you like to call this extension?",
       default: projectName,
+      result(value) {
+        promptState.projectName = value;
+        return value;
+      },
     },
     {
       type: "select",
@@ -42,7 +47,9 @@ const generatorPrompt = (projectName) => {
       message: "What language would you like to use?",
       choices: ["Javascript", "Typescript"],
       result(value) {
-        return value.toLowerCase();
+        const res = value.toLowerCase();
+        promptState.language = res;
+        return res;
       },
     },
     {
@@ -55,6 +62,101 @@ const generatorPrompt = (projectName) => {
         if (parsed === "no framework") {
           parsed = "vanilla";
         }
+        promptState.framework = parsed;
+        return parsed;
+      },
+    },
+    {
+      type: "confirm",
+      name: "useRecommendedPackages",
+      message:
+        "Do you want to install all recommended packages for React? (swr, usehooks-ts, @looker/components, @looker/embed-sdk, @looker/sdk)",
+      skip: () => promptState.framework !== "react",
+      result(value) {
+        promptState.useRecommendedPackages = value;
+        if (value) {
+          promptState.embedType = "Dashboard";
+          promptState.useEmbedSDK = true;
+          promptState.useLookerSDK = true;
+          promptState.uiFramework = "@looker/components";
+        }
+        return value;
+      },
+    },
+    {
+      type: "multiselect",
+      name: "features",
+      message: "Select the features you want to include in your extension:",
+      choices: [
+        "Looker API",
+        "Looker API artifact API",
+        "User Attribute methods",
+        "Looker Embed",
+        "Server Proxy Request",
+      ],
+      result(value) {
+        promptState.features = value;
+        if (value.includes("Looker Embed")) {
+          promptState.useEmbedSDK = true;
+        } else {
+          promptState.useEmbedSDK = false;
+        }
+        if (value.includes("Looker API")) {
+          promptState.useLookerSDK = true;
+        } else {
+          promptState.useLookerSDK = false;
+        }
+        return value;
+      },
+    },
+    {
+      type: "select",
+      name: "embedType",
+      message: "Select the type of content to embed:",
+      choices: ["Dashboard", "Explore", "Look"],
+      skip: () =>
+        promptState.useRecommendedPackages ||
+        !promptState.features ||
+        !promptState.features.includes("Looker Embed"),
+      result(value) {
+        promptState.embedType = value;
+        return value;
+      },
+    },
+    {
+      type: "confirm",
+      name: "useEmbedSDK",
+      message: "Do you want to install the @looker/embed-sdk package?",
+      skip: () => "useEmbedSDK" in promptState || promptState.useRecommendedPackages,
+      result(value) {
+        // promptState.useEmbedSDK = value;
+        return promptState.useEmbedSDK;
+      },
+    },
+    {
+      type: "confirm",
+      name: "useLookerSDK",
+      message:
+        "Do you want to install the @looker/sdk and @looker/sdk-rtl packages?",
+      skip: () => "useLookerSDK" in promptState || promptState.useRecommendedPackages,
+      result(value) {
+        // promptState.useLookerSDK = value;
+        return promptState.useLookerSDK;
+      },
+    },
+    {
+      type: "select",
+      name: "uiFramework",
+      message: "Which UI framework would you like to use?",
+      choices: ["@looker/components", "@mui/material", "No UI framework"],
+      skip: () =>
+        promptState.framework !== "react" || promptState.useRecommendedPackages,
+      result(value) {
+        let parsed = value.toLowerCase();
+        if (parsed === "no ui framework") {
+          parsed = "none";
+        }
+        promptState.uiFramework = parsed;
         return parsed;
       },
     },
@@ -119,7 +221,9 @@ const buildProject = async function (
 
 const installDependencies = async function (answers) {
   const installProcess = (dirname) =>
-    spawnSync("cd", [dirname, "&&", "yarn", "install"], {
+    spawnSync("npm", ["install"],
+      {
+      cwd: dirname,
       stdio: "inherit",
       shell: true,
     });
@@ -140,11 +244,11 @@ const installDependencies = async function (answers) {
     console.log(
       chalk(`To run your new extension, run the following commands:`)
     );
-    console.log(chalk(`1.  cd ${answers["projectName"]}`));
-    console.log(chalk(`2.  yarn develop`));
+    console.log(chalk(`1.  cd ${answers["projectName"]} `));
+    console.log(chalk(`2.  npm run develop`));
     console.log(
       chalk(
-        `Once the yarn server is running, follow the instructions in ${answers["projectName"]}/README.md to add it to your Looker instance.`
+        `Once the npm server is running, follow the instructions in ${answers["projectName"]}/README.md to add it to your Looker instance.`
       )
     );
     console.log(

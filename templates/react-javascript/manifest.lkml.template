@@ -1,26 +1,45 @@
-// Copyright 2021 Google LLC
+module.exports = (options) => {
+  const {
+    useEmbedSDK,
+    useLookerSDK,
+    serverProxy,
+    globalUserAttributes,
+    scopedUserAttributes,
+  } = options;
 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+  const entitlements = {
+    local_storage: 'yes',
+    navigation: 'yes',
+    new_window: 'yes',
+    use_form_submit: 'yes',
+    use_downloads: 'yes',
+    use_iframes: 'yes',
+    use_clipboard: 'yes',
+    ...(useEmbedSDK && { use_embeds: 'yes' }),
+    ...(useLookerSDK && { core_api_methods: ['me'] }),
+    ...(serverProxy && { external_api_urls: [''] }),
+    ...(globalUserAttributes && { global_user_attributes: [''] }),
+    ...(scopedUserAttributes && { scoped_user_attributes: [''] }),
+  };
 
-//     https://www.apache.org/licenses/LICENSE-2.0
+  const entitlementLines = Object.entries(entitlements)
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return `    ${key}: [${value.map((v) => `"${v}"`).join(', ')}]`;
+      }
+      return `    ${key}: ${value}`;
+    })
+    .join('\n');
 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-module.exports = options => `
-project_name: "${options.projectName}"
+  return `project_name: "${options.projectName}"
 
 application: ${options.projectName} {
   label: "${options.projectName}"
   url: "https://localhost:8080/bundle.js"
   # file: "bundle.js"
   entitlements: {
-    core_api_methods: ["me"] #Add more entitlements here as you develop new functionality
+${entitlementLines}
   }
 }
 `;
+};

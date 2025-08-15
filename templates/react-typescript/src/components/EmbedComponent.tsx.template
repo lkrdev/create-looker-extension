@@ -1,0 +1,54 @@
+module.exports = (options) => {
+  const { embedType } = options;
+
+  return `import React, { useCallback } from 'react'
+import { getEmbedSDK } from '@looker/embed-sdk'
+import { useLookerExtension } from '../contexts/LookerExtensionContext'
+
+export const EmbedComponent: React.FC = () => {
+  const { setEmbedDashboard, extensionSDK, dashboardId } = useLookerExtension()
+
+  const embedCtrRef = useCallback((el: HTMLDivElement) => {
+    if (el) {
+      getEmbedSDK().init(extensionSDK.lookerHostData?.hostUrl || '')
+      getEmbedSDK().create${embedType}WithId(dashboardId)
+        .appendTo(el)
+        .withParams({
+          _theme: JSON.stringify({
+            // "background_color": "transparent",
+            "show_title": false
+          })
+        })
+        // .on('dashboard:run:start', (event) => {
+        //   console.log('Dashboard run start', event)
+        // })
+        // .on('dashboard:run:complete', (event) => {
+        //   console.log('Dashboard run complete', event)
+        // })
+        .build()
+        .connect()
+        .then(setEmbedDashboard)
+        .catch((error) => {
+          console.error('Connection error', error)
+        })
+    }
+  }, [])
+
+  // Example of load new content in the iFrame by ID without refreshing the iFrame
+  // const changeContent = useCallback(() => {
+  //   embedDashboard.load${embedType}('')
+  // },[embedDashboard,dashboardId])
+
+  // Example of running the content's queries from outside the iFrame
+  // const handleContentRun = useCallback(() => {
+  //   embedDashboard.as${embedType}Connection().run()
+  // },[embedDashboard])
+
+  return (
+    <div className="embed-container-wrapper">
+      <div ref={embedCtrRef} className="embed-container" />
+    </div>
+  )
+}
+`
+};

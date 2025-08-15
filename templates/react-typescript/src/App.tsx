@@ -18,12 +18,16 @@
   * and returns the logged in user.
 */
 import React from 'react'
-import { ExtensionProvider40 } from '@looker/extension-sdk-react'
+import { HelloWorld } from './components/HelloWorld'
+import { ExtensionProvider } from '@looker/extension-sdk-react'
+import { LookerExtensionProvider } from './contexts/LookerExtensionContext'
 
-import { HelloWorld } from './HelloWorld'
-
-export const App = () => (
-  <ExtensionProvider40>
-    <HelloWorld />
-  </ExtensionProvider40>
-)
+export const App = () => {
+  return (
+    <ExtensionProvider>
+      <LookerExtensionProvider>
+        <HelloWorld />
+      </LookerExtensionProvider>
+    </ExtensionProvider>
+  )
+}

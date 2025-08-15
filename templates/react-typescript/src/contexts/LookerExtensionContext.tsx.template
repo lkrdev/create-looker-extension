@@ -1,0 +1,135 @@
+module.exports = (options) => {
+  const { features, embedType } = options;
+  const hasLookerEmbed = features.includes("Looker Embed");
+  const hasArtifactAPI = features.includes("Looker API artifact API");
+  const hasUserAttributes = features.includes("User Attribute methods");
+  const hasServerProxy = features.includes("Server Proxy Request");
+
+  return `import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { ExtensionContext, ExtensionContextData } from '@looker/extension-sdk-react';
+import type { Looker40SDK } from '@looker/sdk';
+import { IAPIMethods } from '@looker/sdk-rtl';
+${hasLookerEmbed ? `import { getEmbedSDK } from '@looker/embed-sdk'` : ''}
+
+interface LookerExtensionContextState {
+  someDefaultState: string;
+  updateState: (newState: string) => void;
+  extensionSDK: ExtensionContextData['extensionSDK'];
+  core40SDK: Looker40SDK;
+  dashboardId?: string;
+  setDashboardId?: React.Dispatch<React.SetStateAction<string>>;
+  ${hasLookerEmbed ? `embedDashboard?: any;
+  setEmbedDashboard?: React.Dispatch<React.SetStateAction<any | undefined>>;` : ''}
+  ${hasArtifactAPI ? `getArtifact?: () => Promise<any>;
+  updateArtifact?: (body: any) => Promise<any>;` : ''}
+  ${hasUserAttributes ? `getUserAttribute?: (name: string) => Promise<string | null>;
+  setUserAttribute?: (name: string, value: string) => Promise<boolean | undefined>;
+  resetUserAttribute?: (name: string) => Promise<void>;` : ''}
+  ${hasServerProxy ? `serverProxyResponse?: any;
+  serverProxyRequest?: (endpoint: string, body: any) => Promise<any>;` : ''}
+}
+
+const LookerExtensionContext = createContext<LookerExtensionContextState | undefined>(undefined);
+
+export const LookerExtensionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const extensionContext = useContext(ExtensionContext) as ExtensionContextData;
+  const [someDefaultState, setSomeDefaultState] = useState('default');
+  const [dashboardId, setDashboardId] = useState<string>('');
+  ${hasLookerEmbed ? `const [embedDashboard, setEmbedDashboard] = useState<LookerEmbedDashboard | LookerEmbedExplore | LookerEmbedLook | undefined>(undefined);` : ''}
+  ${hasServerProxy ? `const [serverProxyResponse, setServerProxyResponse] = useState<any>(undefined);` : ''}
+
+  const updateState = (newState: string) => {
+    setSomeDefaultState(newState);
+  };
+
+  ${hasLookerEmbed ? `
+  useEffect(() => {
+    if (extensionContext.extensionSDK) {
+      const embed = getEmbedSDK()
+      embed.init(extensionContext.extensionSDK.lookerHostData?.hostUrl || '')
+    }
+  }, [extensionContext.extensionSDK]);
+  ` : ''}
+
+  ${hasArtifactAPI ? `
+  const getArtifact = async () => {
+    if (extensionContext.core40SDK) {
+      return await extensionContext.core40SDK.ok(extensionContext.core40SDK.artifact('artifact_name'));
+    }
+  };
+
+  const updateArtifact = async (body: any) => {
+    if (extensionContext.core40SDK) {
+      return await extensionContext.core40SDK.ok(extensionContext.core40SDK.update_artifacts('artifact_name', body));
+    }
+  };
+  ` : ''}
+
+  ${hasUserAttributes ? `
+  const getUserAttribute = async (name: string) => {
+    if (extensionContext.extensionSDK) {
+      return await extensionContext.extensionSDK.userAttributeGetItem(name);
+    }
+    return null;
+  };
+
+  const setUserAttribute = async (name: string, value: string) => {
+    if (extensionContext.extensionSDK) {
+      return await extensionContext.extensionSDK.userAttributeSetItem(name, value);
+    }
+  };
+
+  const resetUserAttribute = async (name: string) => {
+    if (extensionContext.extensionSDK) {
+      return await extensionContext.extensionSDK.userAttributeResetItem(name);
+    }
+  };
+  ` : ''}
+
+  ${hasServerProxy ? `
+  const serverProxyRequest = async (endpoint: string, body: any) => {
+    if (extensionContext.extensionSDK) {
+      const response = await extensionContext.extensionSDK.serverProxy(endpoint,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: body,
+        } 
+      )
+      setServerProxyResponse(response.body);
+      return response;
+    }
+  };
+  ` : ''}
+
+  const contextValue: LookerExtensionContextState = {
+    someDefaultState,
+    updateState,
+    extensionSDK: extensionContext.extensionSDK,
+    core40SDK: extensionContext.core40SDK,
+    dashboardId,
+    setDashboardId,
+    ${hasLookerEmbed ? `embedDashboard, setEmbedDashboard,` : ''}
+    ${hasArtifactAPI ? `getArtifact, updateArtifact,` : ''}
+    ${hasUserAttributes ? `getUserAttribute, setUserAttribute, resetUserAttribute,` : ''}
+    ${hasServerProxy ? `serverProxyResponse, serverProxyRequest,` : ''}
+  };
+
+  return (
+    <LookerExtensionContext.Provider value={contextValue}>
+      {children}
+    </LookerExtensionContext.Provider>
+  );
+};
+
+export const useLookerExtension = (): LookerExtensionContextState => {
+  const context = useContext(LookerExtensionContext);
+  if (context === undefined) {
+    throw new Error('useLookerExtension must be used within a LookerExtensionProvider');
+  }
+  return context;
+};
+`
+};

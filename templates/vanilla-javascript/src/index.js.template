@@ -1,0 +1,37 @@
+module.exports = (options) => {
+  const { features } = options;
+  const hasLookerEmbed = features.includes("Looker Embed");
+
+  return `
+import './index.css'
+import { connectExtensionHost, LookerExtensionSDK } from '@looker/extension-sdk'
+import { state, setState } from './store'
+import { renderHeader } from './components/Header'
+${hasLookerEmbed ? `import { renderEmbed } from './components/Embed'` : ''}
+
+const main = async () => {
+  const extensionSdk = await connectExtensionHost()
+  const sdk = LookerExtensionSDK.createClient(extensionSdk)
+
+  const headerElement = document.getElementById('main-header');
+  const contentElement = document.getElementById('content-area');
+
+  renderHeader(headerElement, state.userName)
+
+  try {
+    const user = await sdk.ok(sdk.me())
+    setState({ userName: user.display_name })
+    renderHeader(headerElement, state.userName)
+
+    ${hasLookerEmbed ? `renderEmbed(contentElement, 'look', '1')` : ''}
+
+  } catch (error) {
+    console.error(error)
+    setState({ userName: 'Error' })
+    renderHeader(headerElement, state.userName)
+  }
+}
+
+main()
+`
+}

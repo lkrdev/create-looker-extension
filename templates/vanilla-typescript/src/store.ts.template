@@ -1,0 +1,67 @@
+module.exports = (options) => {
+  const { features } = options;
+  const hasLookerEmbed = features.includes("Looker Embed");
+  const hasArtifactAPI = features.includes("Looker API artifact API");
+  const hasUserAttributes = features.includes("User Attribute methods");
+  const hasServerProxy = features.includes("Server Proxy Request");
+
+  return `
+import { AppState } from './types'
+import type { Looker40SDK, ExtensionSDK } from '@looker/sdk'
+
+export const state: AppState = {
+  userName: '',
+  someDefaultState: 'default',
+  ${hasLookerEmbed ? `embedDashboard: undefined,` : ''}
+  ${hasServerProxy ? `serverProxyResponse: undefined,` : ''}
+}
+
+export const setState = (newState: Partial<AppState>) => {
+  Object.assign(state, newState)
+}
+
+export const updateState = (newState: string) => {
+  setState({ someDefaultState: newState })
+}
+
+${hasArtifactAPI ? `
+export const getArtifact = async (sdk: Looker40SDK) => {
+  return await sdk.ok(sdk.artifact('artifact_name'));
+};
+
+export const updateArtifact = async (sdk: Looker40SDK, body: any) => {
+  return await sdk.ok(sdk.update_artifacts('artifact_name', body));
+};
+` : ''}
+
+${hasUserAttributes ? `
+export const getUserAttribute = async (extensionSdk: ExtensionSDK, name: string) => {
+  return await extensionSdk.userAttributeGetItem(name);
+};
+
+export const setUserAttribute = async (extensionSdk: ExtensionSDK, name: string, value: any) => {
+  return await extensionSdk.userAttributeSetItem(name, value);
+};
+
+export const resetUserAttribute = async (extensionSdk: ExtensionSDK, name: string) => {
+  return await extensionSdk.userAttributeResetItem(name);
+};
+` : ''}
+
+${hasServerProxy ? `
+export const serverProxyRequest = async (extensionSdk: ExtensionSDK, endpoint: string, body: any) => {
+  const response = await extensionSdk.serverProxy(endpoint,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    }
+  )
+  setState({ serverProxyResponse: response.body })
+  return response;
+};
+` : ''}
+`
+}

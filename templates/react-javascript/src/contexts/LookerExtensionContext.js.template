@@ -1,0 +1,113 @@
+module.exports = (options) => {
+  const { features, embedType } = options;
+  const hasLookerEmbed = features.includes("Looker Embed");
+  const hasArtifactAPI = features.includes("Looker API artifact API");
+  const hasUserAttributes = features.includes("User Attribute methods");
+  const hasServerProxy = features.includes("Server Proxy Request");
+
+  return `import React, { createContext, useContext, useState, useEffect } from 'react';
+import { ExtensionContext } from '@looker/extension-sdk-react';
+${hasLookerEmbed ? `import { getEmbedSDK } from '@looker/embed-sdk'` : ''}
+
+const LookerExtensionContext = createContext(undefined);
+
+export const LookerExtensionProvider = ({ children }) => {
+  const extensionContext = useContext(ExtensionContext);
+  const [someDefaultState, setSomeDefaultState] = useState('default');
+  const [dashboardId, setDashboardId] = useState('');
+  ${hasLookerEmbed ? `const [embedDashboard, setEmbedDashboard] = useState(undefined);` : ''}
+  ${hasServerProxy ? `const [serverProxyResponse, setServerProxyResponse] = useState(undefined);` : ''}
+
+  const updateState = (newState) => {
+    setSomeDefaultState(newState);
+  };
+
+  ${hasLookerEmbed ? `
+  useEffect(() => {
+    if (extensionContext.extensionSDK) {
+      getEmbedSDK().init(extensionContext.extensionSDK.lookerHostData?.hostUrl || '')
+    }
+  }, [extensionContext.extensionSDK]);
+  ` : ''}
+
+  ${hasArtifactAPI ? `
+  const getArtifact = async () => {
+    if (extensionContext.core40SDK) {
+      return await extensionContext.core40SDK.ok(extensionContext.core40SDK.artifact('artifact_name'));
+    }
+  };
+
+  const updateArtifact = async (body) => {
+    if (extensionContext.core40SDK) {
+      return await extensionContext.core40SDK.ok(extensionContext.core40SDK.update_artifacts('artifact_name', body));
+    }
+  };
+  ` : ''}
+
+  ${hasUserAttributes ? `
+  const getUserAttribute = async (name) => {
+    if (extensionContext.extensionSDK) {
+      return await extensionContext.extensionSDK.userAttributeGetItem(name);
+    }
+  };
+
+  const setUserAttribute = async (name, value) => {
+    if (extensionContext.extensionSDK) {
+      return await extensionContext.extensionSDK.userAttributeSetItem(name, value);
+    }
+  };
+
+  const resetUserAttribute = async (name) => {
+    if (extensionContext.extensionSDK) {
+      return await extensionContext.extensionSDK.userAttributeResetItem(name);
+    }
+  };
+  ` : ''}
+
+  ${hasServerProxy ? `
+  const serverProxyRequest = async (endpoint: string, body: any) => {
+    if (extensionContext.extensionSDK) {
+      const response = await extensionContext.extensionSDK.serverProxy(endpoint,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: body,
+        } 
+      )
+      setServerProxyResponse(response.body);
+      return response;
+    }
+  };
+  ` : ''}
+
+  const contextValue = {
+    someDefaultState,
+    updateState,
+    extensionSDK: extensionContext.extensionSDK,
+    core40SDK: extensionContext.core40SDK,
+    dashboardId,
+    setDashboardId,
+    ${hasLookerEmbed ? `embedDashboard, setEmbedDashboard,` : ''}
+    ${hasArtifactAPI ? `getArtifact, updateArtifact,` : ''}
+    ${hasUserAttributes ? `getUserAttribute, setUserAttribute, resetUserAttribute,` : ''}
+    ${hasServerProxy ? `serverProxyResponse, serverProxyRequest,` : ''}
+  };
+
+  return (
+    <LookerExtensionContext.Provider value={contextValue}>
+      {children}
+    </LookerExtensionContext.Provider>
+  );
+};
+
+export const useLookerExtension = () => {
+  const context = useContext(LookerExtensionContext);
+  if (context === undefined) {
+    throw new Error('useLookerExtension must be used within a LookerExtensionProvider');
+  }
+  return context;
+};
+`
+};

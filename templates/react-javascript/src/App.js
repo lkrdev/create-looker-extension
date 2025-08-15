@@ -19,13 +19,16 @@
 */
 
 import React from 'react'
-import { HelloWorld } from './HelloWorld'
-import { ExtensionProvider40 } from '@looker/extension-sdk-react'
+import { HelloWorld } from './components/HelloWorld'
+import { ExtensionProvider } from '@looker/extension-sdk-react'
+import { LookerExtensionProvider } from './contexts/LookerExtensionContext'
 
 export const App = () => {
   return (
-    <ExtensionProvider40>
-      <HelloWorld />
-    </ExtensionProvider40>
+    <ExtensionProvider>
+      <LookerExtensionProvider>
+        <HelloWorld />
+      </LookerExtensionProvider>
+    </ExtensionProvider>
   )
 }

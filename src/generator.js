@@ -64,7 +64,7 @@ const extensionGenerator = async ({
       finalizeTemplate
     );
 
-    //We yarn install in the script to make the finished project ready to run
+    //We npm install in the script to make the finished project ready to run
     return await installDependencies(answers);
   } catch (e) {
     console.error(

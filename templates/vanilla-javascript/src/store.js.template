@@ -1,0 +1,64 @@
+module.exports = (options) => {
+  const { features } = options;
+  const hasLookerEmbed = features.includes("Looker Embed");
+  const hasArtifactAPI = features.includes("Looker API artifact API");
+  const hasUserAttributes = features.includes("User Attribute methods");
+  const hasServerProxy = features.includes("Server Proxy Request");
+
+  return `
+export const state = {
+  userName: '',
+  someDefaultState: 'default',
+  ${hasLookerEmbed ? `embedDashboard: undefined,` : ''}
+  ${hasServerProxy ? `serverProxyResponse: undefined,` : ''}
+}
+
+export const setState = (newState) => {
+  Object.assign(state, newState)
+}
+
+export const updateState = (newState) => {
+  setState({ someDefaultState: newState })
+}
+
+${hasArtifactAPI ? `
+export const getArtifact = async (sdk) => {
+  return await sdk.ok(sdk.artifact('artifact_name'));
+};
+
+export const updateArtifact = async (sdk, body) => {
+  return await sdk.ok(sdk.update_artifacts('artifact_name', body));
+};
+` : ''}
+
+${hasUserAttributes ? `
+export const getUserAttribute = async (extensionSdk, name) => {
+  return await extensionSdk.userAttributeGetItem(name);
+};
+
+export const setUserAttribute = async (extensionSdk, name, value) => {
+  return await extensionSdk.userAttributeSetItem(name, value);
+};
+
+export const resetUserAttribute = async (extensionSdk, name) => {
+  return await extensionSdk.userAttributeResetItem(name);
+};
+` : ''}
+
+${hasServerProxy ? `
+export const serverProxyRequest = async (extensionSdk, endpoint, body) => {
+  const response = await extensionSdk.serverProxy(endpoint,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    }
+  )
+  setState({ serverProxyResponse: response.body })
+  return response;
+};
+` : ''}
+`
+}

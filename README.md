@@ -8,12 +8,12 @@ We recommend this utility as a quick way to start nearly all extension projects.
 
 ## Example usage:
 
-You must have [Yarn](https://classic.yarnpkg.com/en/docs/install) installed to use this tool.
+You must have [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed to use this tool.
 
 ```shell
-yarn create looker-extension <your-project-name>
+npm init looker-extension <your-project-name>
 cd <your-project-name>
-yarn develop
+npm run develop
 ```
 
 ### Developing this template
@@ -21,16 +21,16 @@ yarn develop
 To run this project locally (for testing changes, etc.), use the following command from the root folder.
 
 ```shell
-yarn new <your-project-name>
+npm run new <your-project-name>
 ```
 
 The template must be generated to a folder that doesn't exist, so a typical flow to incrementally test the template creation would be:
 
 ```shell
-yarn new testfoo
+npm run new testfoo
 # answer prompts
 cd testfoo
-# look at the generated project, yarn develop, etc.
+# look at the generated project, npm run develop, etc.
 cd ..
 rm -rf testfoo
 ```

@@ -1,0 +1,54 @@
+module.exports = (options) => {
+  const { uiFramework } = options;
+  const hasLookerComponents = uiFramework === '@looker/components';
+  const hasMui = uiFramework === '@mui/material';
+
+  return `import React, { useEffect, useState } from 'react'
+${hasLookerComponents ? `import { Space, ComponentsProvider, Span } from '@looker/components'` : ''}
+${hasMui ? `import { Button } from '@mui/material'` : ''}
+import { useLookerExtension } from '../contexts/LookerExtensionContext'
+
+/**
+ * A simple component that uses the Looker SDK through the extension sdk to display a customized hello message.
+ */
+
+export const HelloWorld = () => {
+  const { core40SDK } = useLookerExtension()
+  const [message, setMessage] = useState()
+
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        const value = await core40SDK.ok(core40SDK.me())
+        setMessage("Hello ," + \${value.display_name})
+      } catch (error) {
+        setMessage('Error occured getting information about me!')
+        console.error(error)
+      }
+    }
+    initialize()
+  }, [])
+
+  return (
+    <>
+      ${hasLookerComponents ? `<ComponentsProvider>
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <Span fontSize="xxxxxlarge">
+            {message}
+          </Span>
+          <p style={{color: 'gray'}}>Welcome to your Looker extension starter template, you'll find more in the documentation to get started with your code here. As well as more general extension sdk and Looker api and embed documentation here.</p>
+        </div>
+      </ComponentsProvider>` : ''}
+      ${hasMui ? `<>
+        <Button variant="contained">{message}</Button>
+        <p style={{color: 'gray'}}>Welcome to your Looker extension starter template, you'll find more in the documentation to get started with your code here. As well as more general extension sdk and Looker api and embed documentation here.</p>
+      </>` : ''}
+      ${!hasLookerComponents && !hasMui ? `<>
+        <div>{message}</div>
+        <p style={{color: 'gray'}}>Welcome to your Looker extension starter template, you'll find more in the documentation to get started with your code here. As well as more general extension sdk and Looker api and embed documentation here.</p>
+      </>` : ''}
+    </>
+  )
+}
+`
+};

@@ -14,6 +14,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
@@ -39,6 +40,10 @@ module.exports = {
         include: /src/,
         sideEffects: false,
       },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
   resolve: {
@@ -46,6 +51,10 @@ module.exports = {
     fallback: { buffer: false },
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      inject: 'body',
+    }),
     new BundleAnalyzerPlugin({
       analyzerMode: process.env.ANALYZE_MODE || "disabled",
     }),

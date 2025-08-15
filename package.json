@@ -18,7 +18,7 @@
   "scripts": {
     "test": "mocha --exit",
     "prettier": "prettier --write .",
-    "new": "./src/index.js"
+    "new": "node src/index.js"
   },
   "dependencies": {
     "recursive-readdir": "^2.2.3",
