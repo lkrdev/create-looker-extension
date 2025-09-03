@@ -1,28 +1,29 @@
 module.exports = options => {
   const dependencies = {
-    "@looker/extension-sdk": "^25.4.0",
-    "@looker/extension-sdk-react": "^25.4.0",
-    "react": "^17.0.0",
-    "react-dom": "^17.0.0",
-    "react-is": "^17.0.0",
-    "react-router-dom": "^5.3.0"
+    "@looker/extension-sdk": "^25.10.0",
+    "@looker/extension-sdk-react": "^25.10.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "5.3.4",
+    "formik": "^2.4.6",
+    "react-wrap-balancer": "^1.1.1",
   };
 
   if (options.useRecommendedPackages) {
     dependencies["@looker/components"] = "^5.0.3";
-    dependencies["@looker/embed-sdk"] = "^2.0.6";
+    dependencies["@looker/embed-sdk"] = "^2.0.1";
     dependencies["@looker/sdk"] = "^25.4.0";
     dependencies["@looker/sdk-rtl"] = "^21.6.0";
-    dependencies["@styled-icons/material"] = "10.34.0";
+    dependencies["@styled-icons/material"] = "10.47.0";
     dependencies["@styled-icons/material-outlined"] = "10.34.0";
     dependencies["@styled-icons/material-rounded"] = "10.34.0";
     dependencies["lodash"] = "^4.17.21";
-    dependencies["styled-components"] = "^5.3.3";
+    dependencies["styled-components"] = "^5.3.11";
     dependencies["swr"] = "^2.3.3";
     dependencies["usehooks-ts"] = "^3.1.1";
   } else {
     if (options.useEmbedSDK) {
-      dependencies["@looker/embed-sdk"] = "^2.0.6";
+      dependencies["@looker/embed-sdk"] = "^2.0.1";
     }
 
     if (options.useLookerSDK) {
@@ -32,11 +33,11 @@ module.exports = options => {
 
     if (options.uiFramework === '@looker/components') {
       dependencies["@looker/components"] = "^5.0.3";
-      dependencies["@styled-icons/material"] = "10.34.0";
+      dependencies["@styled-icons/material"] = "10.47.0";
       dependencies["@styled-icons/material-outlined"] = "10.34.0";
       dependencies["@styled-icons/material-rounded"] = "10.34.0";
       dependencies["lodash"] = "^4.17.21";
-      dependencies["styled-components"] = "^5.3.3";
+      dependencies["styled-components"] = "^5.3.11";
     }
 
     if (options.uiFramework === '@mui/material') {
@@ -51,80 +52,36 @@ module.exports = options => {
     version: "0.0.1",
     description: "Bootstrapped Looker Extension with React and Javascript",
     main: "dist/bundle.js",
-    scripts: {
-      analyze: "export ANALYZE_MODE=static && npm run build",
-      build: "export BABEL_ENV=build && webpack --config webpack.prod.js",
-      clean: "rm -rf dist",
-      develop: "webpack serve --hot --port 8080 --config webpack.develop.js",
-      prebuild: "npm run clean",
-      lint: "eslint src --ext js,jsx --fix",
-      format: "prettier --write src"
-    },
     author: "yournamehere",
     license: "Apache-2.0",
-    engines: {
-      node: ">=14"
+    scripts: {
+      "dev:https": "NODE_ENV=development webpack serve --server-type https --port 8080 --hot --mode development --config webpack.develop.js",
+      "build": "NODE_ENV=production webpack --mode production --config webpack.prod.js",
+      "dev": "NODE_ENV=development webpack serve --mode development --port 8080 --config webpack.develop.js",
+      "lint": "eslint src --ext js,jsx --fix",
+      "format": "prettier --write src"
     },
     dependencies: dependencies,
     devDependencies: {
-      "@babel/cli": "^7.23.4",
-      "@babel/core": "^7.23.7",
-      "@babel/plugin-transform-class-properties": "^7.23.3",
-      "@babel/plugin-transform-private-methods": "^7.23.3",
-      "@babel/plugin-transform-private-property-in-object": "^7.23.4",
-      "@babel/plugin-transform-react-jsx": "^7.23.4",
-      "@babel/plugin-transform-runtime": "^7.23.7",
-      "babel-plugin-styled-components": "^2.1.4",
-      "@babel/preset-env": "^7.23.8",
-      "@babel/preset-react": "^7.23.3",
-      "@babel/preset-typescript": "^7.23.3",
-      "@babel/runtime": "^7.23.8",
-      "babel-loader": "^9.1.3",
-      "dotenv": "^16.3.1",
-      "webpack": "^5.89.0",
-      "webpack-bundle-analyzer": "^4.10.1",
-      "webpack-cli": "^5.1.4",
+      "html-webpack-plugin": "^5.6.3",
+      "@babel/core": "^7.26.10",
+      "@babel/preset-env": "^7.26.9",
+      "@babel/preset-react": "^7.26.3",
+      "@pmmmwh/react-refresh-webpack-plugin": "^0.5.16",
+      "babel-loader": "^10.0.0",
+      "css-loader": "^7.1.2",
+      "react-refresh": "^0.17.0",
+      "style-loader": "^4.0.0",
+      "webpack": "^5.67.0",
+      "webpack-cli": "5.1.4",
       "webpack-dev-server": "^4.15.1",
-      "style-loader": "3.3.1",
-      "css-loader": "6.7.1",
+      "webpack-merge": "^5.10.0",
       "eslint": "^8.57.0",
       "eslint-config-prettier": "^9.1.0",
       "eslint-plugin-import": "^2.29.1",
       "eslint-plugin-react": "^7.34.1",
       "eslint-plugin-react-hooks": "^4.6.0",
       "prettier": "^2.8.0"
-    },
-    babel: {
-      presets: [
-        "@babel/preset-env",
-        [
-          "@babel/preset-react",
-          {
-            runtime: "automatic"
-          }
-        ]
-      ],
-      plugins: [
-        [
-          "@babel/plugin-transform-class-properties",
-          {
-            loose: true
-          }
-        ],
-        ["@babel/plugin-transform-private-methods", { "loose": true }],
-        [
-          "@babel/plugin-transform-private-property-in-object",
-          {
-            loose: true
-          }
-        ],
-        [
-          "@babel/plugin-transform-react-jsx",
-          {
-            pragmaFrag: "React.Fragment"
-          }
-        ]
-      ]
     }
   };
 

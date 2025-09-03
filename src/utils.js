@@ -254,7 +254,7 @@ const installDependencies = async function (answers) {
     console.log(
       chalk(`For documentation see: `),
       chalk.blue(
-        `https://docs.looker.com/data-modeling/extension-framework/extension-framework-intro`
+        `https://cloud.google.com/looker/docs/intro-to-extension-framework`
       )
     );
     return true;
