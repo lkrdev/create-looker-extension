@@ -245,7 +245,7 @@ const installDependencies = async function (answers) {
       chalk(`To run your new extension, run the following commands:`)
     );
     console.log(chalk(`1.  cd ${answers["projectName"]} `));
-    console.log(chalk(`2.  npm run develop`));
+    console.log(chalk(`2.  npm run dev:https`));
     console.log(
       chalk(
         `Once the npm server is running, follow the instructions in ${answers["projectName"]}/README.md to add it to your Looker instance.`
