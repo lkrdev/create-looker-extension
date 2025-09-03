@@ -6,19 +6,15 @@ module.exports = (options) => {
   const hasServerProxy = features.includes("Server Proxy Request");
 
   return `
-export const state = {
-  userName: '',
-  someDefaultState: 'default',
-  ${hasLookerEmbed ? `embedDashboard: undefined,` : ''}
-  ${hasServerProxy ? `serverProxyResponse: undefined,` : ''}
-}
+import { signal } from '@preact/signals-core'
 
-export const setState = (newState) => {
-  Object.assign(state, newState)
-}
+export const userName = signal('')
+export const someDefaultState = signal('default')
+${hasLookerEmbed ? `export const embedDashboard = signal(undefined)` : ''}
+${hasServerProxy ? `export const serverProxyResponse = signal(undefined)` : ''}
 
 export const updateState = (newState) => {
-  setState({ someDefaultState: newState })
+  someDefaultState.value = newState
 }
 
 ${hasArtifactAPI ? `
@@ -56,7 +52,7 @@ export const serverProxyRequest = async (extensionSdk, endpoint, body) => {
       body: body,
     }
   )
-  setState({ serverProxyResponse: response.body })
+  serverProxyResponse.value = response.body
   return response;
 };
 ` : ''}

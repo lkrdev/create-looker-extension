@@ -4,8 +4,8 @@ module.exports = (options) => {
   const hasMui = uiFramework === '@mui/material';
 
   return `import React, { useEffect, useState } from 'react'
-${hasLookerComponents ? `import { Space, ComponentsProvider, Span } from '@looker/components'` : ''}
-${hasMui ? `import { Button } from '@mui/material'` : ''}
+${hasLookerComponents ? `import { ComponentsProvider, SpaceVertical, Heading, Card, CardContent, Grid, Link, Text, Space, Box, Icon } from '@looker/components'` : ''}
+${hasMui ? `import { Card, CardContent, Typography, CardActions, Button, Grid } from '@mui/material'` : ''}
 import { useLookerExtension } from '../contexts/LookerExtensionContext'
 
 /**
@@ -20,7 +20,7 @@ export const HelloWorld = () => {
     const initialize = async () => {
       try {
         const value = await core40SDK.ok(core40SDK.me())
-        setMessage("Hello ," + \${value.display_name})
+        setMessage("Hello, " + value.display_name)
       } catch (error) {
         setMessage('Error occured getting information about me!')
         console.error(error)
@@ -32,21 +32,112 @@ export const HelloWorld = () => {
   return (
     <>
       ${hasLookerComponents ? `<ComponentsProvider>
-        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <Span fontSize="xxxxxlarge">
-            {message}
-          </Span>
-          <p style={{color: 'gray'}}>Welcome to your Looker extension starter template, you'll find more in the documentation to get started with your code here. As well as more general extension sdk and Looker api and embed documentation here.</p>
-        </div>
+        <SpaceVertical padding={"2rem"} align={"center"} alignContent={"center"}>
+          <Space align='center' mb="xxxxlarge" justifyItems={"center"} justify='center'>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWbRgdJ0C2JwZ9ru7zVa82ZjhiknWFVBvVug&s" alt="Looker Logo" height="auto" width="200" />
+          </Space>
+          <Heading as="h1" fontWeight="bold" fontSize="xxxxxlarge" mb="xxxxlarge">{message}</Heading>
+          <Grid columns={3} gap="xlarge">
+            <Card raised>
+              <CardContent>
+                <Heading as="h3" fontWeight="semiBold">Looker API</Heading>
+                <Text>Learn more about the Looker API and how to use it in your extensions.</Text>
+                <Link href="https://docs.looker.com/reference/api-and-sdk/api-reference" target="_blank" rel="noopener noreferrer">View Docs</Link>
+              </CardContent>
+            </Card>
+            <Card raised>
+              <CardContent>
+                <Heading as="h3" fontWeight="semiBold">Extension SDK</Heading>
+                <Text>Discover the features of the Looker Extension SDK for building custom applications.</Text>
+                <Link href="https://docs.looker.com/reference/extension-sdk-reference" target="_blank" rel="noopener noreferrer">View Docs</Link>
+              </CardContent>
+            </Card>
+            <Card raised>
+              <CardContent>
+                <Heading as="h3" fontWeight="semiBold">Looker Components</Heading>
+                <Text>Explore the Looker UI Components to create a consistent look and feel.</Text>
+                <Link href="https://components.looker.com/" target="_blank" rel="noopener noreferrer">View Docs</Link>
+              </CardContent>
+            </Card>
+          </Grid>
+        </SpaceVertical>
       </ComponentsProvider>` : ''}
-      ${hasMui ? `<>
-        <Button variant="contained">{message}</Button>
-        <p style={{color: 'gray'}}>Welcome to your Looker extension starter template, you'll find more in the documentation to get started with your code here. As well as more general extension sdk and Looker api and embed documentation here.</p>
-      </>` : ''}
-      ${!hasLookerComponents && !hasMui ? `<>
-        <div>{message}</div>
-        <p style={{color: 'gray'}}>Welcome to your Looker extension starter template, you'll find more in the documentation to get started with your code here. As well as more general extension sdk and Looker api and embed documentation here.</p>
-      </>` : ''}
+      ${hasMui ? `<div className="hello-world-container">
+          <div className="logo-container">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWbRgdJ0C2JwZ9ru7zVa82ZjhiknWFVBvVug&s" alt="Looker Logo" width="100" height="100" />
+          </div>
+          <Typography variant="h3" gutterBottom>{message}</Typography>
+          <Grid container spacing={3} justifyContent="center">
+            <Grid item>
+              <Card sx={{ width: 275 }}>
+                <CardContent>
+                  <Typography variant="h5" component="div">
+                    Looker API
+                  </Typography>
+                  <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                    Learn more about the Looker API and how to use it in your extensions.
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button size="small" href="https://docs.looker.com/reference/api-and-sdk/api-reference" target="_blank" rel="noopener noreferrer">View Docs</Button>
+                </CardActions>
+              </Card>
+            </Grid>
+            <Grid item>
+              <Card sx={{ width: 275 }}>
+                <CardContent>
+                  <Typography variant="h5" component="div">
+                    Extension SDK
+                  </Typography>
+                  <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                    Discover the features of the Looker Extension SDK for building custom applications.
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button size="small" href="https://docs.looker.com/reference/extension-sdk-reference" target="_blank" rel="noopener noreferrer">View Docs</Button>
+                </CardActions>
+              </Card>
+            </Grid>
+            <Grid item>
+              <Card sx={{ width: 275 }}>
+                <CardContent>
+                  <Typography variant="h5" component="div">
+                    Material-UI
+                  </Typography>
+                  <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                    Explore the Material-UI components to create a consistent look and feel.
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button size="small" href="https://mui.com/" target="_blank" rel="noopener noreferrer">View Docs</Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          </Grid>
+        </div>` : ''}
+      ${!hasLookerComponents && !hasMui ? `<div className="hello-world-container">
+          <div className="logo-container">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWbRgdJ0C2JwZ9ru7zVa82ZjhiknWFVBvVug&s" alt="Looker Logo" width="100" height="100" />
+          </div>
+          <h1 className="welcome-message">{message}</h1>
+          <div className="card-container">
+            <div className="card">
+              <h3>Looker API</h3>
+              <p>Learn more about the Looker API and how to use it in your extensions.</p>
+              <a href="https://docs.looker.com/reference/api-and-sdk/api-reference" target="_blank" rel="noopener noreferrer">View Docs</a>
+            </div>
+            <div className="card">
+              <h3>Extension SDK</h3>
+              <p>Discover the features of the Looker Extension SDK for building custom applications.</p>
+              <a href="https://docs.looker.com/reference/extension-sdk-reference" target="_blank" rel="noopener noreferrer">View Docs</a>
+            </div>
+            <div className="card">
+              <h3>Get Started</h3>
+              <p>Learn how to build your own extension with our resources.</p>
+              <a href="https://docs.looker.com/data-modeling/extension-framework/extension-framework-intro" target="_blank" rel="noopener noreferrer">View Docs</a>
+            </div>
+          </div>
+        </div>` : ''}
     </>
   )
 }

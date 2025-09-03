@@ -22,6 +22,7 @@ import React from 'react'
 import { HelloWorld } from './components/HelloWorld'
 import { ExtensionProvider } from '@looker/extension-sdk-react'
 import { LookerExtensionProvider } from './contexts/LookerExtensionContext'
+import './index.css'
 
 export const App = () => {
   return (

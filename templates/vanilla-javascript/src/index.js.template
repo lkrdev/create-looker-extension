@@ -1,37 +1,30 @@
-module.exports = (options) => {
-  const { features } = options;
-  const hasLookerEmbed = features.includes("Looker Embed");
+module.exports = () => `
+import html from './index.html'
+import '../index.css'
+import { LookerExtensionSDK40, connectExtensionHost } from '@looker/extension-sdk'
+import { effect } from '@preact/signals-core'
+import { userName } from './store'
 
-  return `
-import './index.css'
-import { connectExtensionHost, LookerExtensionSDK } from '@looker/extension-sdk'
-import { state, setState } from './store'
-import { renderHeader } from './components/Header'
-${hasLookerEmbed ? `import { renderEmbed } from './components/Embed'` : ''}
+document.body.innerHTML = html
 
-const main = async () => {
+const initialize = async () => {
   const extensionSdk = await connectExtensionHost()
-  const sdk = LookerExtensionSDK.createClient(extensionSdk)
-
-  const headerElement = document.getElementById('main-header');
-  const contentElement = document.getElementById('content-area');
-
-  renderHeader(headerElement, state.userName)
-
+  const core40SDK = LookerExtensionSDK40.createClient(extensionSdk)
   try {
-    const user = await sdk.ok(sdk.me())
-    setState({ userName: user.display_name })
-    renderHeader(headerElement, state.userName)
-
-    ${hasLookerEmbed ? `renderEmbed(contentElement, 'look', '1')` : ''}
-
+    const me = await core40SDK.ok(core40SDK.me())
+    userName.value = me.display_name
   } catch (error) {
     console.error(error)
-    setState({ userName: 'Error' })
-    renderHeader(headerElement, state.userName)
+    userName.value = 'An error occurred while getting information about me!'
   }
 }
 
-main()
+effect(() => {
+  const welcomeMessage = document.querySelector('.welcome-message')
+  if (welcomeMessage) {
+    welcomeMessage.textContent = "Hello, " + userName.value
+  }
+})
+
+initialize()
 `
-}

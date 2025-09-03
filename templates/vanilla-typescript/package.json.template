@@ -1,6 +1,7 @@
 module.exports = options => {
   const dependencies = {
-    "@looker/extension-sdk": "^25.10.0"
+    "@looker/extension-sdk": "^25.10.0",
+    "@preact/signals-core": "^1.2.1"
   };
 
   if (options.useEmbedSDK) {
@@ -32,6 +33,7 @@ module.exports = options => {
       "@types/webpack-env": "^1.18.8",
       "babel-loader": "^10.0.0",
       "css-loader": "^7.1.2",
+      "html-loader": "^5.1.0",
       "html-webpack-plugin": "^5.6.0",
       "style-loader": "^4.0.0",
       "typescript": "^5.8.3",

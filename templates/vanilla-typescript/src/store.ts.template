@@ -6,22 +6,16 @@ module.exports = (options) => {
   const hasServerProxy = features.includes("Server Proxy Request");
 
   return `
-import { AppState } from './types'
+import { signal } from '@preact/signals-core'
 import type { Looker40SDK, ExtensionSDK } from '@looker/sdk'
 
-export const state: AppState = {
-  userName: '',
-  someDefaultState: 'default',
-  ${hasLookerEmbed ? `embedDashboard: undefined,` : ''}
-  ${hasServerProxy ? `serverProxyResponse: undefined,` : ''}
-}
-
-export const setState = (newState: Partial<AppState>) => {
-  Object.assign(state, newState)
-}
+export const userName = signal<string>('')
+export const someDefaultState = signal<string>('default')
+${hasLookerEmbed ? `export const embedDashboard = signal<any>(undefined)` : ''}
+${hasServerProxy ? `export const serverProxyResponse = signal<any>(undefined)` : ''}
 
 export const updateState = (newState: string) => {
-  setState({ someDefaultState: newState })
+  someDefaultState.value = newState
 }
 
 ${hasArtifactAPI ? `
@@ -59,7 +53,7 @@ export const serverProxyRequest = async (extensionSdk: ExtensionSDK, endpoint: s
       body: body,
     }
   )
-  setState({ serverProxyResponse: response.body })
+  serverProxyResponse.value = response.body
   return response;
 };
 ` : ''}

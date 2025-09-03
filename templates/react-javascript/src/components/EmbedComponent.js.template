@@ -6,11 +6,11 @@ import { getEmbedSDK } from '@looker/embed-sdk'
 import { useLookerExtension } from '../contexts/LookerExtensionContext'
 
 export const EmbedComponent = () => {
-  const { setEmbedDashboard, dashboardId } = useLookerExtension()
+  const { setEmbedDashboard, dashboardId, extensionSDK } = useLookerExtension()
 
   const embedCtrRef = useCallback((el) => {
     if (el) {
-      getEmbedSDK().init(extensionSDK.lookerHostData?.hostUrl || ')
+      getEmbedSDK().init(extensionSDK.lookerHostData?.hostUrl || '')
       getEmbedSDK().create${embedType}WithId(dashboardId)
         .appendTo(el)
         .withParams({
